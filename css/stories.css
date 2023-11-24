@@ -54,3 +54,26 @@ body {
     opacity: 0;
     pointer-events: none;
 }
+
+.page-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 1ch;
+
+    grid-area: story;
+    place-self: end center;
+    z-index: 1;
+
+    padding-block-end: 2ch;
+}
+
+.page-indicator {
+    width: 5px;
+    height: 5px;
+    border: 1px solid whitesmoke;
+    border-radius: 50%;
+}
+
+.page-indicator.selected {
+    background-color: whitesmoke;
+}
