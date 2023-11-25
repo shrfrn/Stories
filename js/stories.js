@@ -1,28 +1,46 @@
 'use strict'
 
+var gInterval = 0
+var gElCurrUser = null
+
 function init() {
     const elStories = document.querySelectorAll('.story')
     const elUsers = document.querySelectorAll('.user')
 
-    elUsers.forEach(addPageIndicators)
+    gElCurrUser = elUsers[0]
 
-    elStories.forEach(elStory => addEventListener(elStory))
+    elUsers.forEach(addPageIndicators)
+    elStories.forEach(elStory => elStory.addEventListener('click', onStoryClick))
+
+    // gInterval = setInterval(showNextStory, 3000)
 }
 
-function addEventListener(elStory) {
-    elStory.addEventListener('click', onStoryClick)
+function showNextStory() {
+    const elCurrStory = gElCurrUser.querySelector('.hidden')?.previousElementSibling || gElCurrUser.querySelector(':nth-last-child(1 of .story:not(.hidden))')
+    const isLastUserStory = gElCurrUser.firstElementChild === elCurrStory
+
+    if(!isLastUserStory){
+        elCurrStory.classList.add('hidden')
+        console.log(elCurrStory)
+    } else {
+        gElCurrUser = gElCurrUser.nextElementSibling
+        if(!gElCurrUser) return
+        gElCurrUser.scrollIntoView({ behavior: 'smooth' })
+    }
+    updatePageIndicators(gElCurrUser, 'next')
 }
 
 function onStoryClick(ev) {
     const elStory = this
+    
     const elPageIndicators = elStory.parentElement.querySelector('.page-indicators')
     const isFirstStory = elStory.nextElementSibling === elPageIndicators
     
     const elPrevStory = isFirstStory ? null : elStory.nextElementSibling
     const elNextStory = elStory.previousElementSibling
     
-    const dir = ev.clientX > elStory.clientWidth / 2 ? 'next' : 'prev'
-    console.log(dir)
+    const dir = ev.offsetX > elStory.clientWidth / 2 ? 'next' : 'prev'
+    
     if(dir === 'next') {
         if(elNextStory) {
             elStory.classList.add('hidden')
@@ -31,6 +49,7 @@ function onStoryClick(ev) {
             const elNextUser = elStory.parentElement.nextElementSibling
             if(!elNextUser) return
             elNextUser.scrollIntoView({ behavior: 'smooth' })
+            gElCurrUser = elNextUser
             // elNextUser.childred[0].classList.add('selected')
             resetPageIndicators(elNextUser, dir)
         }
@@ -43,6 +62,8 @@ function onStoryClick(ev) {
             if(!elPrevUser) return
             
             elPrevUser.scrollIntoView({ behavior: 'smooth' })
+            gElCurrUser = elPrevUser
+
             resetPageIndicators(elPrevUser, dir)
         }
     }
