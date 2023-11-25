@@ -6,6 +6,7 @@ body {
     display: grid;
     place-items: center;
     height: 100vh;
+    height: 100svh;
     margin: 0;
 
     /* background-color: lightblue; */
@@ -31,6 +32,12 @@ body {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: contain;
+
+    @media (width < 500px) {
+        width: 100vw;
+        height: 100vh;
+        height: 100svh;
+    }
 }
 
 .user {
@@ -56,24 +63,40 @@ body {
 }
 
 .page-indicators {
+    --padding-inline: 10px;
+    --duration: 3000ms;
+    
     display: flex;
     justify-content: center;
-    gap: 1ch;
+    gap: 3px;
 
     grid-area: story;
-    place-self: end center;
+    place-self: start center;
     z-index: 1;
 
-    padding-block-end: 2ch;
+    width: calc(100% - var(--padding-inline) * 2);
+    padding-block-start: 2ch;
 }
 
 .page-indicator {
-    width: 5px;
-    height: 5px;
-    border: 1px solid whitesmoke;
-    border-radius: 50%;
+    position: relative;
+    height: 1px;
+    background-color: lightgray;
 }
 
-.page-indicator.selected {
+.page-indicator::after {    
+    content: '';
+
+    position: absolute;
+    inset: 0;
+    
     background-color: whitesmoke;
+
+    transform-origin: left;
+    scale: 0 1;
+}
+
+.page-indicator.selected::after {
+    scale: 1;
+    transition: scale var(--duration) linear;
 }
