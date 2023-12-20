@@ -76,35 +76,51 @@ function onStoryClick({ offsetX }) {
     const elNextStory = elCurrUser.querySelector(`[data-story-idx="${currStoryIdx + 1}"]`)
     
     const dir = offsetX < elCurrStory.clientWidth / 2 ? 'prev' : 'next'
-    
-    if(dir === 'next') {
-        if(elNextStory) {
-            elCurrStory.classList.add('hidden')
-            updatePageIndicators(elCurrStory, dir)
-            elCurrUser.dataset.currStoryIdx = currStoryIdx + 1
+    // const elStory = dir === 'next' ? elCurrStory : elPrevStory
+    // debugger
+    if(dir === 'next' && elNextStory || dir === 'prev' && elPrevStory) {
+        const elStory = dir === 'next' ? elCurrStory : elPrevStory
+        if(dir === 'next'){
+            elStory.classList.add('hidden')
         } else {
-            const elNextUser = elCurrUser.nextElementSibling
-            if(!elNextUser) return
-            
-            elNextUser.scrollIntoView({ behavior: 'smooth' })
-            gElCurrUser = elNextUser
-            // resetPageIndicators(elNextUser, dir)
+            elStory.classList.remove('hidden')
         }
+        updatePageIndicators(elCurrStory, dir)
+        elCurrUser.dataset.currStoryIdx = currStoryIdx + (dir === 'next' ? 1 : -1)
     } else {
-        if(elPrevStory) {
-            elPrevStory.classList.remove('hidden')
-            updatePageIndicators(elCurrStory, dir)
-            elCurrUser.dataset.currStoryIdx = currStoryIdx - 1
-        } else {
-            const elPrevUser = elCurrUser.previousElementSibling
-            if(!elPrevUser) return
-            
-            elPrevUser.scrollIntoView({ behavior: 'smooth' })
-            gElCurrUser = elPrevUser
-            
-            // resetPageIndicators(elPrevUser, dir)
-        }
+        const elUser = dir === 'next' ? elCurrUser.nextElementSibling : elCurrUser.previousElementSibling
+        if(!elUser) return
+        gElCurrUser = elUser
+        elUser.scrollIntoView({ behavior: 'smooth' })
     }
+    // if(dir === 'next') {
+    //     if(elNextStory) {
+    //         elCurrStory.classList.add('hidden')
+    //         updatePageIndicators(elCurrStory, dir)
+    //         elCurrUser.dataset.currStoryIdx = currStoryIdx + 1
+    //     } else {
+    //         const elNextUser = elCurrUser.nextElementSibling
+    //         if(!elNextUser) return
+            
+    //         elNextUser.scrollIntoView({ behavior: 'smooth' })
+    //         gElCurrUser = elNextUser
+    //         // resetPageIndicators(elNextUser, dir)
+    //     }
+    // } else {
+    //     if(elPrevStory) {
+    //         elPrevStory.classList.remove('hidden')
+    //         updatePageIndicators(elCurrStory, dir)
+    //         elCurrUser.dataset.currStoryIdx = currStoryIdx - 1
+    //     } else {
+    //         const elPrevUser = elCurrUser.previousElementSibling
+    //         if(!elPrevUser) return
+            
+    //         elPrevUser.scrollIntoView({ behavior: 'smooth' })
+    //         gElCurrUser = elPrevUser
+            
+    //         // resetPageIndicators(elPrevUser, dir)
+    //     }
+    // }
     // gInterval = setInterval(showNextStory, 3000)
 }
 
