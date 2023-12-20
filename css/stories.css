@@ -84,7 +84,7 @@ body {
     background-color: lightgray;
 }
 
-.page-indicator::after {    
+/*.page-indicator::before,*/ .page-indicator::after {    
     content: '';
 
     position: absolute;
@@ -95,6 +95,10 @@ body {
     transform-origin: left;
     scale: 0 1;
 }
+
+/* .page-indicator.skipped::before {
+    scale: 1;
+} */
 
 .page-indicator.selected::after {
     scale: 1;

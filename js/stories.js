@@ -10,19 +10,19 @@ function init() {
 
     elUsers.forEach((elUser, userIdx) => {
         addPageIndicators(elUser)
-        
         const elStories = elUser.querySelectorAll('.story')
+        
         elUser.dataset.userIdx = userIdx
         elUser.dataset.currStoryIdx = 0
         elUser.dataset.storyCount = elStories.length
-
+        
         elStories.forEach((elStory, storyIdx, elStories) => {
             elStory.dataset.storyIdx = elStories.length - storyIdx - 1
             elStory.addEventListener('click', onStoryClick)
         })
     })
     const elFirstPageIndicator = elUsers[0].querySelector('.page-indicator')
-    elFirstPageIndicator.classList.add('.selected')
+    elFirstPageIndicator.classList.add('selected')
 
     const options = {
         root: document.querySelector('.stories'),
@@ -31,21 +31,17 @@ function init() {
     const storyObserver = new IntersectionObserver(resetStory, options)
     elUsers.forEach(user => storyObserver.observe(user))
 
-    elUsers.forEach(addPageIndicators)
-    elStories.forEach(elStory => elStory.addEventListener('click', onStoryClick))
-
-    gInterval = setInterval(showNextStory, 3000)
+    // gInterval = setTimeout(showNextStory, 3000)
 }
 
 function resetStory(entries, observer) {
-    const entry = entries.find(entry => entry.isIntersecting && entry.isVisible)
+    const entry = entries.find(entry => entry.isIntersecting)
     if(!entry) return
 
     const elUser = entry.target
     const elUserStories = elUser.querySelectorAll('.story')
     const elCurrStory = elUserStories[+elUser.dataset.currStoryIdx]
     
-    // const dir = gElCurrUser.dataset.userIdx < elUser.dataset.userIdx ? 'next' : 'prev'
     gElCurrUser = elUser
     updatePageIndicators(elCurrStory)
 }
@@ -65,28 +61,27 @@ function showNextStory() {
         if(!gElCurrUser) return clearInterval(gInterval)
 
         gElCurrUser.scrollIntoView({ behavior: 'smooth' })
-        // resetPageIndicators(gElCurrUser, 'next')
     }
-    updatePageIndicators(elCurrStory, 'next')
+    updatePageIndicators(elCurrStory)
 }
 
 function onStoryClick({ offsetX }) {
-    clearInterval(gInterval)
+    // clearInterval(gInterval)
 
-    const elStory = this
-    const elCurrUser = elStory.parentElement
-    const currStoryIdx = +elStory.dataset.storyIdx
+    const elCurrStory = this
+    const elCurrUser = elCurrStory.parentElement
+    const currStoryIdx = +elCurrStory.dataset.storyIdx
     
     const elPrevStory = elCurrUser.querySelector(`[data-story-idx="${currStoryIdx - 1}"]`)
     const elNextStory = elCurrUser.querySelector(`[data-story-idx="${currStoryIdx + 1}"]`)
     
-    const dir = offsetX < elStory.clientWidth / 2 ? 'prev' : 'next'
+    const dir = offsetX < elCurrStory.clientWidth / 2 ? 'prev' : 'next'
     
     if(dir === 'next') {
         if(elNextStory) {
-            elStory.classList.add('hidden')
+            elCurrStory.classList.add('hidden')
+            updatePageIndicators(elCurrStory, dir)
             elCurrUser.dataset.currStoryIdx = currStoryIdx + 1
-            updatePageIndicators(elStory, dir)
         } else {
             const elNextUser = elCurrUser.nextElementSibling
             if(!elNextUser) return
@@ -98,6 +93,7 @@ function onStoryClick({ offsetX }) {
     } else {
         if(elPrevStory) {
             elPrevStory.classList.remove('hidden')
+            updatePageIndicators(elCurrStory, dir)
             elCurrUser.dataset.currStoryIdx = currStoryIdx - 1
         } else {
             const elPrevUser = elCurrUser.previousElementSibling
@@ -109,8 +105,7 @@ function onStoryClick({ offsetX }) {
             // resetPageIndicators(elPrevUser, dir)
         }
     }
-    updatePageIndicators(elStory, dir)
-    gInterval = setInterval(showNextStory, 3000)
+    // gInterval = setInterval(showNextStory, 3000)
 }
 
 function addPageIndicators(elUser) {
@@ -123,31 +118,32 @@ function addPageIndicators(elUser) {
         return `<div class="page-indicator" style="width: ${width}%;"></div>`
     })
     elPageIndicators.innerHTML = strHtmls.join('')
-    resetPageIndicators(elUser, 'next')
+    // resetPageIndicators(elUser, 'next')
 }
 
-function resetPageIndicators(elUser, dir) {
-    if(dir === 'next') {
-        const elIndicators = elUser.querySelectorAll('.page-indicators .page-indicator')
+// function resetPageIndicators(elUser, dir) {
+//     if(dir === 'next') {
+//         const elIndicators = elUser.querySelectorAll('.page-indicators .page-indicator')
         
-        elIndicators.forEach(elIndicator => elIndicator.classList.remove('selected'))
-        setTimeout(() => elIndicators[0].classList.add('selected'), 12)
-    } else {
-        const elLastIndicator = elUser.querySelector('.page-indicators :nth-last-child(1 of .page-indicator)')
-        console.log(elLastIndicator)
-        elLastIndicator.classList.remove('selected')
-        setTimeout(() => elLastIndicator.classList.add('selected'), 12)
-    }
-}
+//         elIndicators.forEach(elIndicator => elIndicator.classList.remove('selected'))
+//         // setTimeout(() => elIndicators[0].classList.add('selected'), 12)
+//     } else {
+//         const elLastIndicator = elUser.querySelector('.page-indicators :nth-last-child(1 of .page-indicator)')
+//         console.log(elLastIndicator)
+//         elLastIndicator.classList.remove('selected')
+//         setTimeout(() => elLastIndicator.classList.add('selected'), 12)
+//     }
+// }
 
 function updatePageIndicators(elStory, dir) {
     const elUser = elStory.parentElement
     const elNextStory = elStory.previousElementSibling
 
-    const elPageIndicators = elStory.parentElement.querySelector('.page-indicators')
-    
-    // TODO: change next line to - const elCurrPageIndicator = elPageIndicators[+elUser.dataset.currStoryIdx]
-    const elCurrPageIndicator = elPageIndicators.querySelector(':nth-last-child(1 of .selected)')
+    const elPageIndicators = elStory.parentElement.querySelectorAll('.page-indicator')
+    // debugger
+    // TODO: change next line to - 
+    const elCurrPageIndicator = elPageIndicators[+elUser.dataset.currStoryIdx]
+    // const elCurrPageIndicator = elPageIndicators.querySelector(':nth-last-child(1 of .selected)')
     const elNextPageIndicator = elCurrPageIndicator.nextElementSibling
     const elPrevPageIndicator = elCurrPageIndicator.previousElementSibling
 
@@ -157,7 +153,6 @@ function updatePageIndicators(elStory, dir) {
     } else if(dir === 'next') {
         if(elNextStory) {
             elNextPageIndicator.classList.add('selected')
-            console.log('Hi')
         }
         // TODO: Solve canceling in-progress transtion
     } else {
